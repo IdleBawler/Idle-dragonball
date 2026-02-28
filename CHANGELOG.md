@@ -1,10 +1,30 @@
-# Changelog
+# Changelog — Idle Dragon Ball
+
 All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [0.1.0] - 2026-02-28
+
+### Added
+
+- **CLAUDE.md** — project description, rules, and coding standards
+- **Dragon Ball–themed `projInfo.json`** — title, description, and initial version metadata
+- **Ki layer** (`src/data/layers/ki.tsx`) — passive Ki energy generation with three strategic upgrades:
+  - *Ki Sensing* (costs 10 Ki): doubles passive Ki/s
+  - *Ki Control* (costs 100 Ki, unlocked after Ki Sensing): triples passive Ki/s
+  - *Power Level Rising* (costs 1,000 Ki, unlocked after Ki Control): multiplies passive Ki/s by ×5
+- **Updated `projEntry.tsx`** — Dragon Ball–themed main layer featuring the Ki tree node; no click-to-generate mechanics
+
+---
+
+<!-- ============================================================ -->
+<!-- Below this line: upstream Profectus framework changelog       -->
+<!-- Do not edit — kept for reference only                        -->
+<!-- ============================================================ -->
 
 ## [0.7.0] - 2024-12-31
 ### Additions
