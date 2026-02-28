@@ -1,55 +1,40 @@
 import Node from "components/Node.vue";
 import Spacer from "components/layout/Spacer.vue";
-import { createResource, trackBest, trackOOMPS, trackTotal } from "features/resources/resource";
 import { branchedResetPropagation, createTree, Tree } from "features/trees/tree";
 import type { Layer } from "game/layers";
 import { createLayer } from "game/layers";
 import { noPersist } from "game/persistence";
 import player, { Player } from "game/player";
-import type { DecimalSource } from "util/bignum";
-import Decimal, { format, formatTime } from "util/bignum";
+import { formatTime } from "util/bignum";
 import { render } from "util/vue";
-import { computed, toRaw } from "vue";
-import prestige from "./layers/prestige";
+import { computed } from "vue";
+import ki from "./layers/ki";
 
 /**
+ * Main entry layer for Idle Dragon Ball.
+ * This layer hosts the game tree and top-level status displays.
+ * It does NOT generate resources itself — all resource generation is
+ * handled passively inside each individual layer (e.g. ki.tsx).
  * @hidden
  */
-export const main = createLayer("main", layer => {
-    const points = createResource<DecimalSource>(10);
-    const best = trackBest(points);
-    const total = trackTotal(points);
-
-    const pointGain = computed(() => {
-        // eslint-disable-next-line prefer-const
-        let gain = new Decimal(1);
-        return gain;
-    });
-    layer.on("update", diff => {
-        points.value = Decimal.add(points.value, Decimal.times(pointGain.value, diff));
-    });
-    const oomps = trackOOMPS(points, pointGain);
-
-    // Note: Casting as generic tree to avoid recursive type definitions
+export const main = createLayer("main", () => {
+    // A simple tree whose only node is the Ki layer.
+    // More layers (Training, Zenkai, etc.) will be added as new nodes here.
     const tree = createTree(() => ({
-        nodes: noPersist([[prestige.treeNode]]),
+        nodes: noPersist([[ki.treeNode]]),
         branches: [],
         onReset() {
-            points.value = toRaw(tree.resettingNode.value) === toRaw(prestige.treeNode) ? 0 : 10;
-            best.value = points.value;
-            total.value = points.value;
+            // No resources to reset on the main layer itself.
         },
         resetPropagation: branchedResetPropagation
     })) as Tree;
 
-    // Note: layers don't _need_ a reference to everything,
-    //  but I'd recommend it over trying to remember what does and doesn't need to be included.
-    // Officially all you need are anything with persistency or that you want to access elsewhere
     return {
-        name: "Tree",
+        name: "Idle Dragon Ball",
         links: tree.links,
         display: () => (
             <>
+                {/* Dev / debug status indicators */}
                 {player.devSpeed === 0 ? (
                     <div>
                         Game Paused
@@ -58,7 +43,7 @@ export const main = createLayer("main", layer => {
                 ) : null}
                 {player.devSpeed != null && player.devSpeed !== 0 && player.devSpeed !== 1 ? (
                     <div>
-                        Dev Speed: {format(player.devSpeed)}x
+                        Dev Speed: {player.devSpeed}x
                         <Node id="devspeed" />
                     </div>
                 ) : null}
@@ -68,25 +53,19 @@ export const main = createLayer("main", layer => {
                         <Node id="offline" />
                     </div>
                 ) : null}
-                <div>
-                    {Decimal.lt(points.value, "1e1000") ? <span>You have </span> : null}
-                    <h2>{format(points.value)}</h2>
-                    {Decimal.lt(points.value, "1e1e6") ? <span> points</span> : null}
-                </div>
-                {Decimal.gt(pointGain.value, 0) ? (
-                    <div>
-                        ({oomps.value})
-                        <Node id="oomps" />
-                    </div>
-                ) : null}
+
+                {/* Game introduction */}
+                <h2 style="color: #FFD700">🐉 Idle Dragon Ball</h2>
+                <p>
+                    Your power grows passively. Click a layer node below to begin your training.
+                </p>
+
                 <Spacer />
+
+                {/* Layer tree — the player navigates layers from here */}
                 {render(tree)}
             </>
         ),
-        points,
-        best,
-        total,
-        oomps,
         tree
     };
 });
@@ -98,7 +77,7 @@ export const main = createLayer("main", layer => {
 export const getInitialLayers = (
     /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
     player: Partial<Player>
-): Array<Layer> => [main, prestige];
+): Array<Layer> => [main, ki];
 
 /**
  * A computed ref whose value is true whenever the game is over.

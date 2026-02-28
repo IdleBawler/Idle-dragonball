@@ -1,15 +1,15 @@
 {
 	"$schema": "./projInfo-schema.json",
 
-	"title": "Profectus",
-	"description": "A project made in Profectus",
-	"id": "",
-	"author": "",
+	"title": "Idle Dragon Ball",
+	"description": "A passive Dragon Ball incremental game built with Profectus",
+	"id": "idle-dragonball",
+	"author": "IdleBawler",
 	"discordName": "",
 	"discordLink": "",
 
-	"versionNumber": "0.0",
-	"versionTitle": "Initial Commit",
+	"versionNumber": "0.1.0",
+	"versionTitle": "Ki Awakening",
 
 	"allowGoBack": true,
 	"defaultShowSmall": false,
